@@ -1,0 +1,35 @@
+{
+  "name": "camille-js",
+  "version": "1.0.0",
+  "description": "App privacy compliance test tool.",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "frida-compile src/agent/index.ts -o _agent.js -c",
+    "watch": "frida-compile src/agent/index.ts -o _agent.js -w",
+    "test": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@types/yargs": "^17.0.22",
+    "chalk": "4.1.2",
+    "exceljs": "^4.3.0",
+    "frida": "^16.0.11",
+    "frida-compile": "^16.1.8",
+    "md5": "^2.3.0",
+    "ts-node": "^10.9.1",
+    "yargs": "^17.7.1"
+  },
+  "devDependencies": {
+    "@types/browserify": "^12.0.37",
+    "@types/frida-gum": "^18.3.1",
+    "@types/node": "^16.4.8",
+    "browserify": "^17.0.0",
+    "get-stream": "^6.0.1",
+    "tsify": "^5.0.4",
+    "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": ">= 14.13.1",
+    "npm": "~6.9.0"
+  }
+}
