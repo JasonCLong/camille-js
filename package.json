@@ -2,8 +2,19 @@
   "name": "camille-js",
   "version": "1.0.0",
   "description": "App privacy compliance test tool.",
-  "private": true,
   "main": "src/index.ts",
+  "keywords": ["app", "privacy", "compliance", "test"],
+  "author": "mucen",
+  "license": "MIT",
+  "preferGlobal": true,
+  "homepage": "https://github.com/mucen-l/camille-js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mucen-l/camille-js.git"
+  },
+  "bin": {
+    "camille": "dist/index.js"
+  },
   "scripts": {
     "build": "frida-compile src/agent/index.ts -o _agent.js -c",
     "watch": "frida-compile src/agent/index.ts -o _agent.js -w",

@@ -2,49 +2,23 @@ import yargs from "yargs/yargs";
 import pkg from "../package.json";
 import test from "./cmds/test";
 import { hideBin } from "yargs/helpers";
+import chalk from "chalk";
 
 const parser = yargs(hideBin(process.argv))
-  .usage("Usage: compliance [package]")
-  .example("compliance com.wechat", "say hello to zxmf")
-  .epilog("copyright 2021")
+  .strict()
   .command(test)
-  .option("package", {
-    alias: "p",
-    type: "string",
-    require: true,
-    describe: "APP_NAME ex: com.test.demo",
+  .fail(function (msg, err, yargs) {
+    console.error(yargs.help());
+    console.error(chalk.red(`\n\n\n===== Execute failed. =====\n\n${msg || err}\n`));
+    process.exit(1);
   })
-  .option("wait-time", {
-    alias: "t",
-    type: "number",
-    default: 0,
-    describe: "Delayed hook, the number is in seconds ex: 5",
-  })
-  .option("verbose", {
-    alias: "v",
-    type: "boolean",
-    default: true,
-    describe: "Showing the alert message",
-  })
-  .option("merge", {
-    alias: "m",
-    type: 'boolean',
-    describe: "Merge the same stack",
-  })
-  .option("exportExecl", {
-    alias: "f",
-    type: "string",
-    describe: "Name of Excel file to write",
-  })
-  .option("debug", {
-    alias: "d",
-    type: "boolean",
-    describe: "debuger will export script",
-  })
+  .showHelpOnFail(true, '命令指定 --help 查看有效的选项')
+  .wrap(null)
+  .locale('zh_CN')
   .version(pkg.version)
-  .fail(false);
+  .alias('V', 'version')
+  .help('help', '查看命令行帮助')
+  .alias('h', 'help');
 
 export default parser;
 
-type arg = typeof parser.argv;
-export type IArgs = Exclude<arg, Promise<arg>>;

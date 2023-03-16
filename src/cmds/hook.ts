@@ -3,11 +3,11 @@ import * as frida from "frida";
 import { Message, MessageType } from "frida";
 import path from "path";
 import ts from "typescript";
-import { IArgs } from "./parser";
-import { insertCell, mkdirsSync, sleep, tsCompile } from "./util";
+import { insertCell, mkdirsSync, sleep, tsCompile } from "../util";
 import process from 'process';
 import ExcelJS from 'exceljs';
 import md5 from 'md5';
+import { IOptions } from "./test";
 
 interface IStackTrace {
   type: string,
@@ -21,8 +21,8 @@ function isNotice (payload: IStackTrace): payload is IStackTrace {
   return payload.type === 'notice';
 }
 
-export default class FridaHook {
-  private args: IArgs;
+export default class FridaHook<T extends IOptions> {
+  private args: T;
   private device!: frida.Device;
   private session!: frida.Session;
   private script!: frida.Script;
@@ -40,12 +40,12 @@ export default class FridaHook {
     callNum: number;
   }> = new Map();
 
-  constructor(args: IArgs) {
+  constructor(args: T) {
     this.args = args;
-    if (args.exportExecl) {
-      const ext = path.extname(args.exportExecl);
+    if (args.exportExcel) {
+      const ext = path.extname(args.exportExcel);
       if (!ext) {
-        this.args.exportExecl + '.xlsx';
+        this.args.exportExcel + '.xlsx';
       }
     }
   }
@@ -56,12 +56,12 @@ export default class FridaHook {
     await sleep(1000)
     this.session = await this.device.attach(pid)
 
-    if (this.args.exportExecl) {
+    if (this.args.exportExcel) {
       this.createExcel();
     }
     await sleep(1000)
     console.log("attached:", this.session);
-    let injectScript = await tsCompile(path.resolve(__dirname, './agent/index.ts'), {
+    let injectScript = await tsCompile(path.resolve(__dirname, '../agent/index.ts'), {
       compilerOptions: {
         module: ts.ModuleKind.CommonJS,
         outFile: 'dist/agent.js'
@@ -83,7 +83,6 @@ export default class FridaHook {
     await sleep(this.args.waitTime + 500);
     if (this.isHook) {
       process.on('SIGINT', this.sigintHandle);
-      process.on('SIGTERM', this.sigintHandle);
     } else {
       console.log("[*] hook fail, try delaying hook, adjusting delay time")
     }
@@ -107,7 +106,7 @@ export default class FridaHook {
           console.log(chalk.white(payload.stacks));
           console.log("-------------------------------end----------------------------------");
       }
-      if (this.args.exportExecl) {
+      if (this.args.exportExcel) {
         const style: ExcelJS.Style = {
           numFmt: '',
           font: {
@@ -160,7 +159,7 @@ export default class FridaHook {
     console.log('[*] You have stoped hook.')
     this.session.detach();
     this.device.kill(this.session.pid);
-    if(this.args.exportExecl) {
+    if(this.args.exportExcel) {
       this.save();
     }
   }
@@ -217,8 +216,8 @@ export default class FridaHook {
   }
 
   save() {
-    if (!this.args.exportExecl) return;
-    mkdirsSync(path.dirname(this.args.exportExecl));
-    this.workbook.xlsx.writeFile(this.args.exportExecl);
+    if (!this.args.exportExcel) return;
+    mkdirsSync(path.dirname(this.args.exportExcel));
+    this.workbook.xlsx.writeFile(this.args.exportExcel);
   }
 }
